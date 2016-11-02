@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cloudrone</title>
+<meta charset="utf-8"  />
+
+<meta name="viewport" content="width=device-width,user-scalable=no" />
+  <script src="jquery-3.0.0.min.js"></script>
+  
+  
+  
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="lib/leaflet/leaflet.css" />
+	<link rel="stylesheet" href="lib/cluster/MarkerCluster.css" />	
+	<link rel="stylesheet" href="Leaflet.Photo.css" />	
+	<link rel="stylesheet" href="css/map.css" />
+<script>
+
+function locati(){
+//alert('came');}
+// var person = prompt("Please enter your name", "Harry Potter");
+ mapx.locate({setView: true,maxZoom: 19});
+
+ } 
+</script>
+  <style>
+  body{
+  background-color: #34484F;
+}
+  table, th , td  {
+    top:30px;
+	width:80vw;;
+    border: 1px solid grey;
+    border-collapse: collapse;
+    padding: 5px;
+	margin-left:5px;
+}
+table tr:nth-child(odd) {
+    background-color: #f1f1f1;
+}
+table tr:nth-child(even) {
+    background-color: #ffffff;
+}
+div.absolute {
+    position: absolute;
+    top: 86.2%;
+	width:100%;
+	height:100%;
+    }
+   #mapid{ height: 100% }
+  </style>
+  </head>
+<body onload="locati()">
+
+<div id="map" style="position:absolute; width:100%;height:80%;"></div>
+<div id="id01" class="absolute">Loading....</div>
+<script type='text/javascript' src='markers.json'></script>    
+<button class="pure-button pure-button-primary" style="cursor:pointer; position:absolute;top:80%;right:50%; padding: 10px; ">Get my location</button>
+<div style="cursor:pointer;position:absolute;top:88%;right:10%;"><button type="button" onclick="loading()">Refresh</button></div>
+<script src="lib/reqwest.min.js"></script>
+	<script src="lib/leaflet/leaflet.js"></script>
+	<script src="lib/cluster/leaflet.markercluster.js"></script>	
+	<script src="Leaflet.Photo.js"></script>	
+	<script type='text/javascript' src='rows.json'></script>    
+<b><div id="time" style="position:absolute;top:91.5%;left:15px;"></div></b>	
+ <script>
+ var xmlhttp = new XMLHttpRequest();
+var url = "phptestdelete.php";
+xmlhttp.open("GET", url, true);
+xmlhttp.send();
+ //for table on the right(if time permits add refresh button to it)
+(function () {
+    function checkTime(i) {
+        return (i < 10) ? "0" + i : i;
+    }
+
+    function startTime() {
+        var today = new Date(),
+            h = checkTime(today.getHours()),
+            m = checkTime(today.getMinutes()),
+            s = checkTime(today.getSeconds());
+        document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
+        t = setTimeout(function () {
+            startTime()
+        }, 500);
+    }
+    startTime();
+})();
+
+ var xmlhttp = new XMLHttpRequest();
+var url = "phpinfo_beacon.php";
+xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        myFunction(xmlhttp.responseText);
+    }
+}
+xmlhttp.open("GET", url, true);
+xmlhttp.send();
+
+function myFunction(response) {
+ 
+    var arr= JSON.parse(response);
+	
+    var i;
+    var out = "<table>";
+
+  
+        out += "<tr><td>"+ "Time Stamp"+"</td><td>"+"SENSOR 1"+"</td><td>"+"SENSOR 2"+"</td><td>"+"SENSOR 3"+"</td></tr>"+"<tr><td>"+
+       "    "+"</td><td>"+arr[0] + " m" +
+        "</td><td>" +
+        arr[1] + " m" +
+        "</td><td>" +
+        arr[2] + " m" +
+        "</td></tr>";
+    
+    out += "</table>"; 
+    document.getElementById("id01").innerHTML = out;
+
+}
+
+
+
+
+
+
+ /*
+ for ( var i=0; i < markers.length; ++i ) 
+{ 
+      L.marker( [markers[i].lat, markers[i].lng])
+      .bindPopup(markers[i].name+"<br>" +"Temperature:"+ markers[i].sensor1+ "&#8451" +"<br>")
+      .addTo( mapx );
+
+} */
+
+
+//initialise map
+	
+	var mapx = L.map('map').setView([52.22086, 0.10772],14);  
+     /*var mapx = L.map('map',{
+    center: [52.22086, 0.10772],
+    zoom: 13,
+});	*/
+    var array=
+
+L.tileLayer("tiles/{z}/{x}/{y}.png",{
+	attribution:"© OpenStreetMap contributors. Tiles: CC-BY-SA 2.0\r\nMap data © OpenStreetMap contributors", 
+	minZoom:11,
+	maxZoom:19,
+	}).addTo(mapx);  
+
+	
+$('.pure-button').on('click', function(){
+  mapx.locate({setView: true,maxZoom: 19});
+  
+});
+mapx.on('locationfound', onLocationFound);
+function onLocationFound(e) {
+    //console.log(e); 
+    // e.heading will contain the user's heading (in degrees) if it's available, and if not it will be NaN. This would allow you to point a marker in the same direction the user is pointed. 
+     L.marker(e.latlng).addTo(mapx);
+	var radius = e.accuracy / 2;
+
+    //L.marker(e.latlng).addTo(mapx)
+       // .bindPopup("You are within " + radius + " meters from this point").openPopup();
+	   var latde = e.latlng.lat;
+   var longde = e.latlng.lng;
+   popup
+        .setLatLng(e.latlng)
+        .setContent("<b>You are within</b> " + radius + " <b>meters from this point.</b>"+  "<br><b>Upload by choosing file: </b>" + '<p></p>'+ '<form action="upload.php" name="myform" method="POST" enctype="multipart/form-data"><input type="hidden" name="extra" value= "e.latlng.lat" /><input type="hidden" name="extra1" value= "e.latlng.lng" />Message: <input name="msg" type="text" style="padding-right: 60px; margin-bottom:12px;" /><input type="file" name="image" style="width:200px"><input type="submit" value="submit"  /></form>')
+        .openOn(mapx);
+
+
+		document.myform.extra.value = latde;
+        document.myform.extra1.value = longde;
+		
+    L.circle(e.latlng, radius).addTo(mapx);
+
+}
+
+
+	mapx.on('locationerror', function(e){
+           console.log(e);
+           alert("Location access denied.");
+        });
+
+
+		
+		
+	/*
+	function showError(error) {
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            alert("User denied the request for Geolocation.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            alert("Location information is unavailable.");
+            break;
+        case error.TIMEOUT:
+            alert("The request to get user location timed out.");
+            break;
+        case error.UNKNOWN_ERROR:
+            alert("An unknown error occurred.");
+            break;
+    }
+}
+	*/
+		
+	
+ var marker1 = L.marker([markers[0].lat, markers[0].lng]).addTo(mapx);
+ var marker2 =  L.marker([markers[1].lat, markers[1].lng]).addTo(mapx);
+ var marker3 =  L.marker([markers[2].lat, markers[2].lng]).addTo(mapx);
+ //var marker4 =  L.marker([markers[3].lat, markers[3].lng]).addTo(mapx);
+ //var marker5 = L.marker([markers[4].lat, markers[4].lng]).addTo(mapx); 
+ 
+ //initialise markers
+
+ //marker.bindPopup("Loading..").addTo(mapx);                          
+   marker1.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo.php", function (data) { 
+	       for ( var i=0; i < data.length; i++ ) 
+		   {
+		   var marker1 = L.marker([markers[0].lat, markers[0].lng]).addTo(mapx);
+
+            //var location = new L.LatLng(data[i].lat, data[i].lng);          //AS THE WE DONT HAVE GPS AND SENSORS ARE FIXED AS GRID ON GROUND SO NO NEED OF THIS
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			
+
+       marker1.bindPopup("<b>SENSOR 1</b>"+ "<br>" +"Temperature:"+ data[i].sensor1+"&#8451"+"<br>")
+	   .openPopup()
+	   .addTo(mapx);
+	           
+ }
+        });
+      } ); 
+	  
+	  
+	  
+	  
+	  marker2.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo.php", function (data) { 
+	       for ( var i=0; i < data.length; i++ ) 
+		   {
+		   var marker2 = L.marker([markers[1].lat, markers[1].lng]).addTo(mapx);
+	
+            //var location = new L.LatLng(data[i].lat, data[i].lng); 
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			
+
+       marker2.bindPopup("<b>SENSOR 2</b>"+ "<br>" +"Temperature:"+ data[i].sensor2+"&#8451"+"<br>")
+	   .openPopup()
+	   .addTo(mapx);
+	           
+ }
+        });
+      } );
+	  
+	  
+	  
+	  
+	 marker3.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo.php", function (data) { 
+	       for ( var i=0; i < data.length; i++ ) 
+		   {
+		   var marker3 = L.marker([markers[2].lat, markers[2].lng]).addTo(mapx);
+
+            //var location = new L.LatLng(data[i].lat, data[i].lng); 
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			marker3.bindPopup("<b>SENSOR 3</b>"+ "<br>" +"Temperature:"+ data[i].sensor3+"&#8451"+"<br>")
+			.openPopup()
+	   .addTo(mapx);
+	           
+ }
+        });
+      } );
+	  
+	  /*
+	  
+	  marker4.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo.php", function (data) { 
+	       for ( var i=0; i < data.length; i++ ) 
+		   {
+		   var marker4 = L.marker([markers[3].lat, markers[3].lng]).addTo(mapx);
+	
+            //var location = new L.LatLng(data[i].lat, data[i].lng); 
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			
+
+       marker4.bindPopup("<b>SENSOR 4</b>"+ "<br>" +"Temperature:"+ data[i].sensor4+"&#8451"+"<br>")
+	   .openPopup()
+	   .addTo(mapx);
+	           
+ }
+        });
+      } );
+	  
+	  
+	  
+	  
+	   marker5.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo.php", function (data) { 
+	       for ( var i=0; i < data.length; i++ ) 
+		   {
+		   var marker5 = L.marker([markers[4].lat, markers[4].lng]).addTo(mapx);
+	
+            //var location = new L.LatLng(data[i].lat, data[i].lng); 
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			
+
+       marker5.bindPopup("<b>SENSOR 5</b>"+ "<br>" +"Temperature:"+ data[i].sensor5+"&#8451"+"<br>")
+	   .openPopup()
+	   .addTo(mapx);
+	           
+ }
+        });
+      } ); */
+//marker( [markers[i].lat, markers[i].lng]).on('click', getInfo);
+
+
+
+
+//lat & long of all the points on the map
+
+
+ //this is called on refresh
+ 
+ 
+ 
+ function loading() {
+ 
+ var xmlhttp = new XMLHttpRequest();
+var url = "phpinfo_beacon.php";
+
+xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        myFunction(xmlhttp.responseText);
+    }
+}
+xmlhttp.open("GET", url, true);
+xmlhttp.send();
+
+function myFunction(response) {
+ 
+    var arr= JSON.parse(response);
+	
+    var i;
+    var out = "<table>";
+    out += "<tr><td>"+ "Time Stamp"+"</td><td>"+"SENSOR 1"+"</td><td>"+"SENSOR 2"+"</td><td>"+"SENSOR 3"+"</td></tr>"+"<tr><td>"+
+       "   "+"</td><td>"+arr[0] + " m" +
+        "</td><td>" +
+        arr[1] + " m" +
+        "</td><td>" +
+        arr[2] + " m" +
+        "</td></tr>";
+    
+    out += "</table>"; 
+    document.getElementById("id01").innerHTML = out;
+
+}
+
+
+
+var marker1 = L.marker([markers[0].lat, markers[0].lng]).addTo(mapx);
+ var marker2 =  L.marker([markers[1].lat, markers[1].lng]).addTo(mapx);
+ var marker3 =  L.marker([markers[2].lat, markers[2].lng]).addTo(mapx);
+
+
+ 
+   marker1.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo_beacon.php", function (data) { 
+	       
+		  for ( var i=0; i < data.length; i++ ) 
+		   { 
+		   var marker1 = L.marker([markers[0].lat, markers[0].lng]).addTo(mapx);
+
+            //var location = new L.LatLng(data[i].lat, data[i].lng);          //AS THE WE DONT HAVE GPS AND SENSORS ARE FIXED AS GRID ON GROUND SO NO NEED OF THIS
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			
+
+       marker1.bindPopup("<b>SENSOR 1</b>"+ "<br>"+ "<b>Mac: d5:d4:e7:df:49:b7</b>"+"<br>"+"Distance:"+ data[0]+" m"+"<br>")
+	   .openPopup()
+	   .addTo(mapx);
+	 }          
+  });
+        
+      } ); 
+	  
+ 
+	  
+	  
+	  marker2.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo_beacon.php", function (data) { 
+	       
+		   for ( var i=0; i < data.length; i++ ) 
+		   {
+		   var marker2 = L.marker([markers[1].lat, markers[1].lng]).addTo(mapx);
+	
+            //var location = new L.LatLng(data[i].lat, data[i].lng); 
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			
+
+       marker2.bindPopup("<b>SENSOR 2</b>"+ "<br>"+ "<b>Mac: f7:c1:27:f6:bf:2d</b>"+"<br>"+"Distance:"+ data[1]+" m"+"<br>")
+	   .openPopup()
+	   .addTo(mapx);
+	           
+ }
+        });
+      } );
+	  
+	  
+	  
+	  
+	 marker3.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo_beacon.php", function (data) { 
+	       for ( var i=0; i < data.length; i++ ) 
+		   {
+		   var marker3 = L.marker([markers[2].lat, markers[2].lng]).addTo(mapx);
+
+            //var location = new L.LatLng(data[i].lat, data[i].lng); 
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			//marker3.bindPopup("<b>SENSOR 3</b>"+ "<br>" +"Temperature:"+ data[i].sensor3+"&#8451"+"<br>")
+			marker3.bindPopup("<b>SENSOR 3</b>"+ "<br>"+ "<b>Mac: cb:3c:47:9f:64:78</b>"+"<br>"+"Distance:"+ data[2]+" m"+"<br>")
+			.openPopup()
+	   .addTo(mapx);
+	           
+ }
+        });
+      } );
+	  
+	}      //loadDoc closing  
+	/*  
+	  marker4.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo.php", function (data) { 
+	       for ( var i=0; i < data.length; i++ ) 
+		   {
+		   var marker4 = L.marker([markers[3].lat, markers[3].lng]).addTo(mapx);
+	
+            //var location = new L.LatLng(data[i].lat, data[i].lng); 
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			
+
+       marker4.bindPopup("<b>SENSOR 4</b>"+ "<br>" +"Temperature:"+ data[i].sensor4+"&#8451"+"<br>")
+	   .openPopup()
+	   .addTo(mapx);
+	           
+ }
+        });
+      } );
+	  
+	  
+	  
+	  
+	   marker5.on('mouseover',function getInfo() {           
+      $.getJSON("phpinfo.php", function (data) { 
+	       for ( var i=0; i < data.length; i++ ) 
+		   {
+		   var marker5 = L.marker([markers[4].lat, markers[4].lng]).addTo(mapx);
+	
+            //var location = new L.LatLng(data[i].lat, data[i].lng); 
+            //var marker = new L.Marker(location,{icon:Icon1}); 
+            //var ll = marker.getLatLng();
+			
+
+       marker5.bindPopup("<b>SENSOR 5</b>"+ "<br>" +"Temperature:"+ data[i].sensor5+"&#8451"+"<br>")
+	   .openPopup()
+	   .addTo(mapx);
+	           
+ }
+        });
+      } );
+	  */
+//marker( [markers[i].lat, markers[i].lng]).on('click', getInfo);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ var popup= L.popup();
+
+function onMapClick(e) {
+   var latde = e.latlng.lat;
+   var longde = e.latlng.lng;
+   popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString() +  "<br><b>No sensor at this location. Upload by choosing file </b>" + '<p></p>'+ '<form action="upload.php" name="myform" method="POST" enctype="multipart/form-data"><input type="hidden" name="extra" value= "e.latlng.lat" /><input type="hidden" name="extra1" value= "e.latlng.lng" /><input type="file" name="image" style="width:200px"><input type="submit" value="submit"  /></form>')
+        .openOn(mapx);
+
+
+		document.myform.extra.value = latde;
+        document.myform.extra1.value = longde;
+		
+		
+
+}
+mapx.on('click', onMapClick);
+
+
+
+var photoLayer = L.photo.cluster().on('click', function (evt) {
+		var photo = evt.layer.photo,
+			template = '<img src="{url}" width="300" height="300" /></a><p>{caption}</p>';
+
+		if (photo.video && (!!document.createElement('video').canPlayType('video/mp4; codecs=avc1.42E01E,mp4a.40.2'))) {
+			template = '<video autoplay controls poster="{url}" width="300" height="300"><source src="{video}" type="video/mp4"/></video>';
+		}; 
+
+		evt.layer.bindPopup(L.Util.template(template, photo), {
+			className: 'leaflet-popup-photo',
+			minWidth: 300
+		}).openPopup();
+	});
+
+	
+	reqwest({
+		
+		    url: 'rows.json',
+		 	success: function (data) {
+			photoLayer.add(data.rows).addTo(mapx);
+			mapx.fitBounds(photoLayer.getBounds());
+		}
+	});
+
+	
+ 
+
+	 </script>
+
+		 
+</body>
+</html>
+ 
+ 
